@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>LRL URL Shortener</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      height: 100vh;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: #fff;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 40px;
+      border-radius: 18px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+    p {
+      opacity: 0.8;
+      margin-bottom: 30px;
+    }
+    input {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      margin-bottom: 15px;
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+      color: #fff;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+    #result {
+      margin-top: 20px;
+      word-break: break-all;
+    }
+    #result a {
+      color: #aee7ff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .copy {
+      margin-top: 10px;
+      font-size: 14px;
+      opacity: 0.9;
+      cursor: pointer;
+    }
+    .footer {
+      margin-top: 30px;
+      font-size: 13px;
+      opacity: 0.7;
+    }
+    .footer a {
+      color: #ffffff;
+      text-decoration: none;
+    }
+    .footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>🔗 URL Shortener</h1>
+    <p>긴 주소를 짧게 만들어보세요</p>
+
+    <input id="longUrl" placeholder="https://example.com">
+    <button onclick="shorten()">단축하기</button>
+
+    <div id="result"></div>
+
+    <div class="footer">
+      <a href="https://playentry.org/profile/67418b28e977499d37175aa8/project?sort=created&term=all&isOpen=all" target="_blank">
+        Made by Check
+      </a>
+    </div>
+  </div>
+
+  <script>
+    async function shorten() {
+      const longUrl = document.getElementById("longUrl").value;
+      if (!longUrl) {
+        alert("URL을 입력하세요");
+        return;
+      }
+
+      const res = await fetch("https://api.lrl.kr/v6/short", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": "d06083f9-a3e1-4645-ab16-6707a8fb953b"
+        },
+        body: JSON.stringify({ url: longUrl })
+      });
+
+      const data = await res.json();
+
+      if (data.result) {
+        document.getElementById("result").innerHTML = `
+          <a id="shortUrl" href="${data.result}" target="_blank">${data.result}</a>
+          <div class="copy" onclick="copyUrl()">📋 클릭해서 복사</div>
+        `;
+      } else {
+        document.getElementById("result").innerText = "오류 발생";
+      }
+    }
+
+    function copyUrl() {
+      const text = document.getElementById("shortUrl").innerText;
+      navigator.clipboard.writeText(text);
+      alert("복사 완료!");
+    }
+  </script>
+
+</body>
+</html>
